@@ -1,0 +1,28 @@
+[2026-03-31 04:05:13] [WARNING ] discord.client: PyNaCl is not installed, voice will NOT be supported
+[2026-03-31 04:05:13] [WARNING ] discord.client: davey is not installed, voice will NOT be supported
+[2026-03-31 04:05:13] [INFO    ] bot: Health check server running on port 8080
+[2026-03-31 04:05:13] [INFO    ] bot: Bot starting...
+[2026-03-31 04:05:14] [CRITICAL] bot: Bot crashed: Improper token has been passed.
+Traceback (most recent call last):
+  File "C:\Users\Steven\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\discord\http.py", line 844, in static_login
+    data = await self.request(Route('GET', '/users/@me'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Steven\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\discord\http.py", line 778, in request
+    raise HTTPException(response, data)
+discord.errors.HTTPException: 401 Unauthorized (error code: 0): 401: Unauthorized
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Steven\Downloads\thiendao_bot-main\bot.py", line 225, in main
+    await bot.start(TOKEN)
+  File "C:\Users\Steven\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\discord\client.py", line 850, in start
+    await self.login(token)
+  File "C:\Users\Steven\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\discord\client.py", line 679, in login
+    data = await self.http.static_login(token)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Steven\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\discord\http.py", line 848, in static_login
+    raise LoginFailure('Improper token has been passed.') from exc
+discord.errors.LoginFailure: Improper token has been passed.
+[2026-03-31 04:05:14] [INFO    ] bot: Bot shutting down...
+[2026-03-31 04:05:14] [INFO    ] bot: Bot shutdown complete.
