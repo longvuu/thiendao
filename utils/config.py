@@ -207,15 +207,15 @@ LINH_CAN_BY_ID = {lc["id"]: lc for lc in LINH_CAN}
 # Điểm linh căn yêu cầu để nhận dot_pha_buff (lớp 2) khi đột phá đại cảnh
 # Key = canh_gioi MỚI sau đột phá
 LINH_CAN_DIEM_YEU_CAU = {
-    1: 100,   # lên Trúc Cơ
-    2: 200,   # lên Kết Tinh
-    3: 350,   # lên Kim Đan
-    4: 550,   # lên Cụ Linh
-    5: 800,   # lên Nguyên Anh
-    6: 1100,  # lên Hóa Thần
-    7: 1500,  # lên Ngộ Đạo
-    8: 2000,  # lên Vũ Hóa
-    9: 2700,  # lên Đăng Tiên
+    1: 200,   # lên Trúc Cơ
+    2: 300,   # lên Kết Tinh
+    3: 400,   # lên Kim Đan
+    4: 600,   # lên Cụ Linh
+    5: 900,   # lên Nguyên Anh
+    6: 1300,  # lên Hóa Thần
+    7: 1600,  # lên Ngộ Đạo
+    8: 2400,  # lên Vũ Hóa
+    9: 3000,  # lên Đăng Tiên
 }
 
 LINH_CAN_CO_BAN = [lc["id"] for lc in LINH_CAN if lc["loai"] == "co_ban"]  # 5 căn cơ bản
@@ -223,7 +223,7 @@ LINH_CAN_HIEM   = [lc["id"] for lc in LINH_CAN if lc["loai"] == "hiem"]    # 4 c
 
 # Yêu cầu điểm linh căn để đột phá cảnh giới LỚN (index = cg_id đích)
 # Ví dụ: đột phá lên Trúc Cơ (cg=1) cần 100đ mỗi căn đang sở hữu
-LINH_CAN_YEU_CAU_DIEM = [0, 100, 200, 350, 550, 800, 1100, 1500, 2000, 2700]
+LINH_CAN_YEU_CAU_DIEM = [0, 200, 300, 400, 600, 900, 1300, 1600, 2400, 3000]
 
 def random_linh_can_khoi_dau() -> list:
     """Random linh căn khi tạo hồ sơ mới.
