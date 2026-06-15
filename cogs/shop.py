@@ -91,8 +91,8 @@ class ShopView(discord.ui.View):
         super().__init__(timeout=None)
 
     @discord.ui.button(
-        label="🛒 Mua Gói",
-        style=discord.ButtonStyle.primary,
+        label="� Donate",
+        style=discord.ButtonStyle.green,
         custom_id="shop_buy_button",
     )
     async def shop_button(
@@ -100,15 +100,15 @@ class ShopView(discord.ui.View):
     ) -> None:
         contact = f"<@{SHOP_CONTACT_ID}>"
         embed = discord.Embed(
-            title="🛒 Thiên Đế Shop",
+            title="💝 Thiên Đế Donate",
             description=(
-                "**HƯỚNG DẪN MUA:**\n"
+                "**HƯỚNG DẪN DONATE:**\n"
                 "1️⃣ Chọn gói bên dưới\n"
                 "2️⃣ Chuyển khoản đúng số tiền vào 1 trong 2 QR\n"
                 "3️⃣ Gửi bill xác nhận cho " + contact + "\n"
                 "4️⃣ Nhận code → dùng `/redeem <CODE>` để nhận thưởng!"
             ),
-            color=0x5865F2,
+            color=0x57F287,
         )
 
         for _pkg_id, pkg in SHOP_PACKAGES.items():
@@ -243,20 +243,20 @@ class Shop(commands.Cog):
         embed.set_footer(text="Chúc mừng tu sĩ! 🎊")
         await safe_followup(interaction, embed=embed)
 
-    # ── /shop (hiển thị button) ──────────────────────────────────────────
-    @app_commands.command(name="shop", description="Xem cửa hàng và mua gói")
-    async def shop(self, interaction: discord.Interaction) -> None:
+    # ── /donate (hiển thị button) ──────────────────────────────────────
+    @app_commands.command(name="donate", description="Xem cửa hàng donate và mua gói")
+    async def donate(self, interaction: discord.Interaction) -> None:
         contact = f"<@{SHOP_CONTACT_ID}>"
         embed = discord.Embed(
-            title="🛒 Thiên Đế Shop",
+            title="💝 Thiên Đế Donate",
             description=(
-                "**HƯỚNG DẪN MUA:**\n"
-                "1️⃣ Nhấn nút **🛒 Mua Gói** bên dưới\n"
+                "**HƯỚNG DẪN DONATE:**\n"
+                "1️⃣ Nhấn nút **💝 Donate** bên dưới\n"
                 "2️⃣ Chuyển khoản đúng số tiền vào 1 trong 2 QR\n"
                 "3️⃣ Gửi bill xác nhận cho " + contact + "\n"
                 "4️⃣ Nhận code → dùng `/redeem <CODE>` để nhận thưởng!"
             ),
-            color=0x5865F2,
+            color=0x57F287,
         )
         await interaction.response.send_message(embed=embed, view=ShopView())
 
