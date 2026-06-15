@@ -44,6 +44,7 @@ from utils.config import (
     BOSS_ANNOUNCE_CHANNEL_ID,
     DOTPHA_TC_NGUYEN_LIEU, DOTPHA_TC_DROP_RATE,
     VAN_DINH_TUVI_YEU_CAU,
+    SHOP_CONTACT_ID,
 )
 from utils.emoji_manager import get_stat_emoji
 from cogs.cong_phap import CONG_PHAP, LOAI_CONG_PHAP, CongPhapView, calc_cp_bonus
@@ -73,6 +74,7 @@ from cogs.views.sung_thu import SungThuView, _embed_sung_thu_list, _parse_sung_t
 from cogs.views.kho_do    import (KhoDoView, BanLaiModal, TreoBanDTLModal,
                                    CuaHangView, MuaDanModal, PhuongThiView,
                                    MuaPhienModal, DangBanModal)
+from cogs.shop import ShopView
 from cogs.views.boss      import _build_ket_qua, LobbyBossView, BossView, _build_initial_boss_message
 from cogs.views.profile   import DangKyModal, ChinhSuaModal, _DangKyTriggerView
 from cogs.views.quan_he   import TangQuaView, _embed_quan_he
@@ -289,7 +291,7 @@ class HoSoView(discord.ui.View):
             self._add(0, "🌸 Tông môn",    discord.ButtonStyle.secondary, self._cb_tong_mon)
             # ── Row 1: Tu luyện ───────────────────────────────────────
             self._add(1, "⚡ Tu luyện",    discord.ButtonStyle.primary,   self._cb_tu_luyen)
-            self._add(1, "🛒 Cửa hàng",   discord.ButtonStyle.success,   self._cb_cua_hang)
+            self._add(1, "💝 Donate",   discord.ButtonStyle.success,   self._cb_donate)
             self._add(1, "🎒 Túi đồ",     discord.ButtonStyle.secondary, self._cb_kho_do)
             self._add(1, "🌐 Hệ Thống CG", discord.ButtonStyle.secondary, self._cb_he_thong_cg)
             # ── Row 2: Thế giới ───────────────────────────────────────
@@ -1164,18 +1166,21 @@ class HoSoView(discord.ui.View):
     # ══════════════════════════════════════════════════════════
     #  SUB-CALLBACKS — KHO ĐỒ TAB
     # ══════════════════════════════════════════════════════════
-    async def _cb_cua_hang(self, inter: discord.Interaction):
+    async def _cb_donate(self, inter: discord.Interaction):
         if not await self._guard(inter): return
-        embed = discord.Embed(title="🛒 VẠN BẢO LÂU", color=0xFFD700)
-        dd_lines = [
-            f"{d['emoji']} **{d['ten']}**  {fmt(d['gia'])} {E_LINH_THACH}"
-            for d in DAN_DUOC if d.get("shop", True)]
-        embed.add_field(
-            name="Đan Dược",
-            value="\n".join(dd_lines) if dd_lines else "*(Đan dược hiện không có bán — tìm kiếm trong Bí Cảnh!)*",
-            inline=False)
-        embed.set_footer(text="Pháp bảo sẽ được bổ sung sau.")
-        await inter.response.send_message(embed=embed, view=CuaHangView(self, actor_id=inter.user.id), ephemeral=True)
+        contact = f"<@{SHOP_CONTACT_ID}>"
+        embed = discord.Embed(
+            title="💝 Thiên Đế Donate",
+            description=(
+                "**HƯỚNG DẪN DONATE:**\n"
+                "1️⃣ Nhấn nút **💝 Donate** bên dưới\n"
+                "2️⃣ Chuyển khoản đúng số tiền vào 1 trong 2 QR\n"
+                "3️⃣ Gửi bill xác nhận cho " + contact + "\n"
+                "4️⃣ Nhận code → dùng `/redeem <CODE>` để nhận thưởng!"
+            ),
+            color=0x57F287,
+        )
+        await inter.response.send_message(embed=embed, view=ShopView(), ephemeral=True)
 
     async def _cb_phuong_thi(self, inter: discord.Interaction):
         if not await self._guard(inter): return
