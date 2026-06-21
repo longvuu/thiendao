@@ -211,3 +211,101 @@ BUFF_LABELS: dict[str, str] = {
     "linh_thach": "Linh thạch",
     "hp":         "Sinh lực tối đa",
 }
+
+# ══════════════════════════════════════════════════════
+#  QUÁI SCALE THEO TRƯNG SINH
+# ══════════════════════════════════════════════════════
+TRUNG_SINH_MONSTER_SCALE = 0.15  # +15% HP/ATK/DEF per rebirth
+
+def monster_scale(so_lan_ts: int) -> float:
+    """Hệ số scale quái theo số lần trùng sinh."""
+    return 1.0 + so_lan_ts * TRUNG_SINH_MONSTER_SCALE
+
+# ══════════════════════════════════════════════════════
+#  Ý CẢNH — SKILL TREE
+# ══════════════════════════════════════════════════════
+Y_CANH_DIEM_CO_BAN = 5
+Y_CANH_DIEM_MOI_TS = 3
+
+def y_canh_diem_toi_da(so_lan_ts: int) -> int:
+    """Điểm skill tree tối đa = 5 + (số lần trùng sinh × 3)."""
+    return Y_CANH_DIEM_CO_BAN + so_lan_ts * Y_CANH_DIEM_MOI_TS
+
+DA_NGO_DAO_ID = "da_ngo_dao"
+DA_NGO_DAO_GIA = 5000  # linh thạch per stone
+
+DA_RESET_SKILL_TREE_ID = "da_reset_skill_tree"
+DA_RESET_SKILL_TREE_GIA = 20000  # linh thạch
+
+Y_CANH_NHANH = [
+    {
+        "id": "hoa_diem_tam_muoi", "ten": "Hỏa Diệm Tam Muội", "emoji": "🔥",
+        "mo_ta": "Con đường tấn công, tăng ATK và Bạo Kích",
+        "nodes": [
+            {"id": "tam_muoi_chan_hoa", "ten": "Tam Muội Chân Hỏa", "max_lv": 5, "cost": [5,10,15,25,40], "effect": {"at_pct": 2}},
+            {"id": "liem_tram_phan_hoa", "ten": "Liêm Trảm Phẫn Hỏa", "max_lv": 5, "cost": [5,10,15,25,40], "effect": {"bao_kich": 1.5}},
+            {"id": "thien_hoa_phe_hon", "ten": "Thiên Hỏa Phệ Hồn", "max_lv": 3, "cost": [15,30,50], "effect": {"crit_dmg": 5}},
+            {"id": "dien_linh_thuat", "ten": "Diệm Linh Thuật", "max_lv": 3, "cost": [20,40,60], "effect": {"hut_mau_crit": 2}},
+            {"id": "hoa_long_chan_y", "ten": "Hỏa Long Chân Ý", "max_lv": 1, "cost": [100], "effect": {"at_pct": 15}},
+        ]
+    },
+    {
+        "id": "huyen_vu_chan_thuat", "ten": "Huyền Vũ Chân Thuật", "emoji": "🛡️",
+        "mo_ta": "Con đường phòng thủ, tăng HP và DEF",
+        "nodes": [
+            {"id": "huyen_quy_ho_the", "ten": "Huyền Quy Hộ Thể", "max_lv": 5, "cost": [5,10,15,25,40], "effect": {"hp_pct": 3}},
+            {"id": "vu_giap_thien_thanh", "ten": "Vũ Giáp Thiên Thành", "max_lv": 5, "cost": [5,10,15,25,40], "effect": {"def_pct": 2}},
+            {"id": "xa_giap_bat_hoai", "ten": "Xà Giáp Bất Hoại", "max_lv": 3, "cost": [15,30,50], "effect": {"khang_bao": 2}},
+            {"id": "thuy_nguyen_hoi_thien", "ten": "Thủy Nguyên Hồi Thiên", "max_lv": 3, "cost": [20,40,60], "effect": {"hoi_sinh_luc": 1}},
+            {"id": "huyen_vu_chan_than", "ten": "Huyền Vũ Chân Thân", "max_lv": 1, "cost": [100], "effect": {"hp_pct": 20, "def_pct": 10}},
+        ]
+    },
+    {
+        "id": "loi_phan_thien_co", "ten": "Lôi Phẫn Thiên Cơ", "emoji": "⚡",
+        "mo_ta": "Con đường linh lực, tăng kỹ năng và hồi phục",
+        "nodes": [
+            {"id": "loi_dong_cuu_thien", "ten": "Lôi Động Cửu Thiên", "max_lv": 5, "cost": [5,10,15,25,40], "effect": {"linh_luc_pct": 3}},
+            {"id": "phan_loi_chan_hon", "ten": "Phẫn Lôi Chấn Hồn", "max_lv": 5, "cost": [5,10,15,25,40], "effect": {"hoi_tam": 2}},
+            {"id": "thien_loi_phat_toi", "ten": "Thiên Lôi Phạt Tội", "max_lv": 3, "cost": [15,30,50], "effect": {"ho_tam": 2}},
+            {"id": "loi_thuat_dien_thien", "ten": "Lôi Thuật Diên Thiên", "max_lv": 3, "cost": [20,40,60], "effect": {"cd_giam": 1.5}},
+            {"id": "loi_phan_chan_y", "ten": "Lôi Phẫn Chân Ý", "max_lv": 1, "cost": [100], "effect": {"linh_luc_pct": 20}},
+        ]
+    },
+    {
+        "id": "moc_duyen_sinh_co", "ten": "Mộc Duyên Sinh Cơ", "emoji": "🌿",
+        "mo_ta": "Con đường sinh trưởng, tăng EXP và Drop",
+        "nodes": [
+            {"id": "moc_duyen_sinh_truong", "ten": "Mộc Duyên Sinh Trưởng", "max_lv": 5, "cost": [5,10,15,25,40], "effect": {"exp_pct": 2}},
+            {"id": "thao_moc_huu_tinh", "ten": "Thảo Mộc Hữu Tình", "max_lv": 5, "cost": [5,10,15,25,40], "effect": {"drop_rate": 2}},
+            {"id": "sinh_co_vo_tan", "ten": "Sinh Cơ Vô Tận", "max_lv": 3, "cost": [15,30,50], "effect": {"the_luc_hoi": 1}},
+            {"id": "thien_dia_quy_nguyen", "ten": "Thiên Địa Quy Nguyên", "max_lv": 3, "cost": [20,40,60], "effect": {"lt_nhan": 3}},
+            {"id": "moc_duyen_chan_y", "ten": "Mộc Duyên Chân Ý", "max_lv": 1, "cost": [100], "effect": {"exp_pct": 15, "drop_rate": 10}},
+        ]
+    },
+]
+
+# Build lookup
+Y_CANH_BY_NHANH = {n["id"]: n for n in Y_CANH_NHANH}
+Y_CANH_ALL_NODES = {}
+for _n in Y_CANH_NHANH:
+    for _nd in _n["nodes"]:
+        Y_CANH_ALL_NODES[_nd["id"]] = {**_nd, "nhanh_id": _n["id"]}
+
+TRAN_DAO = [
+    {"id": "tran_liet_hoa", "ten": "Trận Liệt Hỏa", "emoji": "🔥",
+     "mo_ta": "Tấn công mạnh, hy sinh máu",
+     "buff": {"at_pct": 25}, "debuff": {"hp_pct": -10}, "unlock": None},
+    {"id": "tran_huyen_vu", "ten": "Trận Huyền Vũ", "emoji": "🛡️",
+     "mo_ta": "Phòng thủ vững, hy sinh tấn công",
+     "buff": {"hp_pct": 30, "def_pct": 15}, "debuff": {"at_pct": -10},
+     "unlock": {"nhanh": "huyen_vu_chan_thuat", "node": "huyen_quy_ho_the"}},
+    {"id": "tran_bach_ho", "ten": "Trận Bạch Hổ", "emoji": "🐯",
+     "mo_ta": "Tấn công + bạo kích, hy sinh phòng ngự",
+     "buff": {"at_pct": 20, "bao_kich": 10}, "debuff": {"def_pct": -10},
+     "unlock": {"nhanh": "hoa_diem_tam_muoi", "node": "tam_muoi_chan_hoa"}},
+    {"id": "tran_phong_loi", "ten": "Trận Phong Lôi", "emoji": "⛈️",
+     "mo_ta": "Linh lực + kỹ năng nhanh, hy sinh máu",
+     "buff": {"linh_luc_pct": 20, "cd_giam": 15}, "debuff": {"hp_pct": -10},
+     "unlock": {"nhanh": "loi_phan_thien_co", "node": "loi_dong_cuu_thien"}},
+]
+TRAN_DAO_BY_ID = {t["id"]: t for t in TRAN_DAO}

@@ -74,6 +74,8 @@ def _embed_chuan_bi(ts: dict[str, Any]) -> discord.Embed:
     so_lan    = ts.get("so_lan_trung_sinh", 0)
     ti_le     = ts.get("ti_le_van_dinh", 0.001)
     ti_le_pct = round(ti_le * 100, 2)
+    da_vd     = ts.get("da_van_dinh", False)
+    vd_bonus  = float(ts.get("van_dinh_all_stat_pct", 0.0) or 0.0)
 
     du_tuvi = tong_tv >= VAN_DINH_TUVI_YEU_CAU
 
@@ -92,10 +94,12 @@ def _embed_chuan_bi(ts: dict[str, Any]) -> discord.Embed:
             f"{'✅' if du_tuvi else '❌'} Tu vi hiện có: **{fmt(tong_tv)}** / {fmt(VAN_DINH_TUVI_YEU_CAU)}\n"
             f"🎲 Tỉ lệ thành công: **{ti_le_pct}%**\n"
             f"🔄 Số lần đã trùng sinh: **{so_lan}**\n"
-            f"📈 Bonus all-stat tích lũy: **+{vd_bonus:.2f}%**"
+            f"📈 Bonus all-stat tích lũy: **+{vd_bonus:.2f}%**\n"
+            f"{'✅' if da_vd else '❌'} Đã vấn đỉnh: **{'Có' if da_vd else 'Chưa'}**"
         ),
         inline=False,
     )
+    bonus_text = "**+5% all-stat**" if da_vd else "**+2% all-stat** (chưa vấn đỉnh)"
     embed.add_field(
         name="💡 Sau khi trùng sinh",
         value=(
@@ -103,9 +107,9 @@ def _embed_chuan_bi(ts: dict[str, Any]) -> discord.Embed:
             "• Giữ lại: tài nguyên đột phá thể chất trong kho\n"
             "• Tỉ lệ Vấn Đỉnh lần sau tăng **+1.5%**\n"
             "• Thành công: nhận **+5% all-stat** vĩnh viễn\n"
-            "• Thất bại: nhận **+1% all-stat** vĩnh viễn\n"
+            f"• Thất bại: nhận {bonus_text} vĩnh viễn\n"
             "• Tỉ lệ drop linh quả tăng **×1.5**, không giới hạn cảnh giới\n"
-            "• Xóa: linh thạch, phiên chợ, giao dịch gần đây"
+            "• Xóa: linh thạch, phiên chợ, giao dịch gần đây, Ý Cảnh, Trận Đạo"
         ),
         inline=False,
     )
@@ -174,14 +178,22 @@ class VanDinhView(discord.ui.View):
 
         dao_hieu = ts_fresh.get("dao_hieu", "Vô Danh")
         ti_le    = ts_fresh.get("ti_le_van_dinh", 0.01)
+        da_vd    = ts_fresh.get("da_van_dinh", False)
 
         # Roll
         thanh_cong = random.random() < ti_le
 
-        bonus_stat = 5.0 if thanh_cong else 1.0
+        # Bonus: thành công → 5% + đánh dấu đã vấn đỉnh
+        # Thất bại: đã vấn đỉnh trước đó → 5%, chưa → 2%
+        if thanh_cong:
+            bonus_stat = 5.0
+            new_da_vd = True
+        else:
+            bonus_stat = 5.0 if da_vd else 2.0
+            new_da_vd = da_vd
 
         # Thực hiện trùng sinh (dù thành công hay thất bại)
-        await thuc_hien_trung_sinh(inter.user.id, bonus_all_stat_pct=bonus_stat)
+        await thuc_hien_trung_sinh(inter.user.id, bonus_all_stat_pct=bonus_stat, da_van_dinh=new_da_vd)
 
         # Broadcast toàn server
         if thanh_cong:
@@ -209,17 +221,19 @@ class VanDinhView(discord.ui.View):
                     "Nhưng thế giới không thể chịu đựng — **Trùng Sinh** đã bắt đầu...\n\n"
                     "Bạn đã được đưa trở về **Luyện Khí Sơ Kỳ**.\n"
                     "Bạn nhận thêm **+5% all-stat** vĩnh viễn.\n"
+                    "Đã mở **Ý Cảnh** và **Trận Đạo**!\n"
                     "Tỉ lệ đột phá Vấn Đỉnh lần sau đã tăng thêm **+1.5%**!"
                 ),
                 color=0xFFD700,
             )
         else:
+            bonus_pct = "5%" if da_vd else "2%"
             embed = discord.Embed(
                 title="💀 ĐỘT PHÁ THẤT BẠI",
                 description=(
                     f"**{dao_hieu}** không thể vượt qua ý chí thiên đạo...\n\n"
                     "**Trùng Sinh** bắt đầu — trở về **Luyện Khí Sơ Kỳ**.\n"
-                    "Bạn nhận thêm **+1% all-stat** vĩnh viễn.\n"
+                    f"Bạn nhận thêm **+{bonus_pct} all-stat** vĩnh viễn.\n"
                     "Tỉ lệ đột phá Vấn Đỉnh lần sau đã tăng thêm **+1.5%**!"
                 ),
                 color=0x888888,

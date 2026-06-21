@@ -205,7 +205,10 @@ CREATE TABLE IF NOT EXISTS tu_si (
     linh_can_lop2       TEXT    DEFAULT '{}',
     so_lan_trung_sinh   INTEGER DEFAULT 0,
     ti_le_van_dinh      REAL    DEFAULT 0.01,
-    van_dinh_all_stat_pct REAL  DEFAULT 0
+    van_dinh_all_stat_pct REAL  DEFAULT 0,
+    da_van_dinh         BOOLEAN DEFAULT FALSE,
+    y_canh              TEXT    DEFAULT '{}',
+    tran_dao_active     TEXT    DEFAULT ''
 );
 
 CREATE TABLE IF NOT EXISTS tong_mon_thanh_vien (
@@ -386,6 +389,9 @@ async def migrate_db():
         ("so_lan_trung_sinh",  "INTEGER DEFAULT 0"),
         ("ti_le_van_dinh",     "REAL DEFAULT 0.01"),
         ("van_dinh_all_stat_pct", "REAL DEFAULT 0"),
+        ("da_van_dinh",        "BOOLEAN DEFAULT FALSE"),
+        ("y_canh",             "TEXT DEFAULT '{}'"),
+        ("tran_dao_active",    "TEXT DEFAULT ''"),
     ]
 
     async with pool.acquire() as conn:

@@ -122,7 +122,7 @@ class DangKyModal(discord.ui.Modal, title="✦ Nhập Môn Tu Tiên ✦"):
                 for k, v in lop2_all.items():
                     if v:
                         label = STAT_LABEL.get(k, k)
-                        if "pct" in k or k in ("bao_kich", "khang_bao"):
+                        if "pct" in k or k in ("bao_kich", "khang_bao", "drop_rate"):
                             lop2_lines.append(f"{label}: **+{round(v, 2)}%** ✅")
                         else:
                             lop2_lines.append(f"{label}: **+{int(v)}** ✅")

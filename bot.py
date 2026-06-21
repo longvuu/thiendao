@@ -219,6 +219,17 @@ async def on_tree_error(inter: discord.Interaction, error: discord.app_commands.
             pass
         return
 
+    if isinstance(error, discord.app_commands.TransformerError):
+        try:
+            if not inter.response.is_done():
+                await inter.response.send_message(
+                    "❌ Không tìm thấy người dùng trong server. Hãy chọn từ danh sách gợi ý.",
+                    ephemeral=True,
+                )
+        except Exception:
+            pass
+        return
+
     # Lỗi tree khác: giữ log để debug
     log.error("Unhandled tree error", exc_info=error)
 
@@ -237,7 +248,10 @@ async def on_app_command_error(inter: discord.Interaction, error: discord.app_co
         f"| {type(error).__name__}: {error}",
         exc_info=error
     )
-    msg = f"Lỗi: {error}"
+    if isinstance(error, discord.app_commands.TransformerError):
+        msg = "❌ Không tìm thấy người dùng trong server. Hãy chọn từ danh sách gợi ý."
+    else:
+        msg = f"Lỗi: {error}"
     try:
         if inter.response.is_done():
             await safe_followup(inter, f"❌ {msg}", ephemeral=True)
