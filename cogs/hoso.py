@@ -96,7 +96,7 @@ from utils.bot_emojis import (
     E_TIM_DO, E_TIM_NUA, E_TIM_DEN,
     E_TU_VI,
 )
-from utils.embeds import safe_followup
+from utils.embeds import safe_followup, safe_defer
 
 # ══════════════════════════════════════════════════════════════
 #  MAIN HOSO VIEW
@@ -232,17 +232,20 @@ class HoSoView(discord.ui.View):
 
     async def _cb_kho_do(self, inter: discord.Interaction):
         if not await self._guard(inter): return
-        ts    = await get_tu_si(inter.user.id)
+        if not await safe_defer(inter, ephemeral=True):
+            return
+        ts = await get_tu_si(inter.user.id)
+        if not ts:
+            return await safe_followup(inter,
+                "❌ Không tìm thấy hồ sơ! Dùng `/hoso` để tạo nhân vật.",
+                ephemeral=True)
         items = _build_inventory(ts)
         embed = _embed_kho_trang(ts, inter.user, items, 0)
         view  = KhoDoView(self, inter.user, ts, items, actor_id=inter.user.id)
-        await inter.response.send_message(embed=embed, view=view, ephemeral=True)
+        msg = await safe_followup(inter, embed=embed, view=view, ephemeral=True)
         # Lưu message reference để modal có thể edit real-time
-        try:
-            msg = await inter.original_response()
+        if msg:
             view._original_msg = msg
-        except Exception:
-            log.exception("Lỗi hoso")
 
     async def _cb_chinh_sua(self, inter: discord.Interaction):
         if not await self._guard(inter): return
@@ -272,12 +275,16 @@ class HoSoView(discord.ui.View):
 
     async def _cb_y_canh(self, inter: discord.Interaction):
         if not await self._guard(inter): return
-        await inter.response.defer(ephemeral=True)
+        if not await safe_defer(inter, ephemeral=True):
+            return
+        ts = await get_tu_si(inter.user.id)
+        if not ts:
+            return await safe_followup(inter, "❌ Không tìm thấy hồ sơ!", ephemeral=True)
+        if ts.get("so_lan_trung_sinh", 0) < 1:
+            return await safe_followup(inter,
+                "❌ Ý Cảnh chỉ mở sau khi **trùng sinh** lần đầu!", ephemeral=True)
         try:
             from cogs.views.y_canh import YCanhView, _embed_y_canh
-            ts = await get_tu_si(inter.user.id)
-            if not ts:
-                return await safe_followup(inter, "❌ Không tìm thấy hồ sơ!", ephemeral=True)
             embed = _embed_y_canh(ts)
             view = YCanhView(self, ts, actor_id=inter.user.id)
             await safe_followup(inter, embed=embed, view=view, ephemeral=True)
@@ -287,12 +294,16 @@ class HoSoView(discord.ui.View):
 
     async def _cb_tran_dao(self, inter: discord.Interaction):
         if not await self._guard(inter): return
-        await inter.response.defer(ephemeral=True)
+        if not await safe_defer(inter, ephemeral=True):
+            return
+        ts = await get_tu_si(inter.user.id)
+        if not ts:
+            return await safe_followup(inter, "❌ Không tìm thấy hồ sơ!", ephemeral=True)
+        if ts.get("so_lan_trung_sinh", 0) < 1:
+            return await safe_followup(inter,
+                "❌ Trận Đạo chỉ mở sau khi **trùng sinh** lần đầu!", ephemeral=True)
         try:
             from cogs.views.tran_dao import TranDaoView, _embed_tran_dao
-            ts = await get_tu_si(inter.user.id)
-            if not ts:
-                return await safe_followup(inter, "❌ Không tìm thấy hồ sơ!", ephemeral=True)
             embed = _embed_tran_dao(ts)
             view = TranDaoView(self, ts, actor_id=inter.user.id)
             await safe_followup(inter, embed=embed, view=view, ephemeral=True)
@@ -302,12 +313,16 @@ class HoSoView(discord.ui.View):
 
     async def _cb_cua_hang_y_canh(self, inter: discord.Interaction):
         if not await self._guard(inter): return
-        await inter.response.defer(ephemeral=True)
+        if not await safe_defer(inter, ephemeral=True):
+            return
+        ts = await get_tu_si(inter.user.id)
+        if not ts:
+            return await safe_followup(inter, "❌ Không tìm thấy hồ sơ!", ephemeral=True)
+        if ts.get("so_lan_trung_sinh", 0) < 1:
+            return await safe_followup(inter,
+                "❌ Cửa Hàng Ý Cảnh chỉ mở sau khi **trùng sinh** lần đầu!", ephemeral=True)
         try:
             from cogs.views.cua_hang_y_canh import CuaHangYCanhView, _embed_shop
-            ts = await get_tu_si(inter.user.id)
-            if not ts:
-                return await safe_followup(inter, "❌ Không tìm thấy hồ sơ!", ephemeral=True)
             embed = _embed_shop(ts)
             view = CuaHangYCanhView(self, ts, actor_id=inter.user.id)
             await safe_followup(inter, embed=embed, view=view, ephemeral=True)
@@ -1896,7 +1911,7 @@ class HoSoCog(commands.Cog, name="Hồ Sơ"):
     @app_commands.command(name="killboss", description="[Owner] Force kill boss đang active")
     @app_commands.describe(boss_id="0=Hình Thiên 1=Trường Thừa 2=Đào Ngột 3=Kế Mông (-1=tất cả)")
     async def killboss(self, inter: discord.Interaction, boss_id: int = -1):
-        if inter.user.id != OWNER_ID:
+        if inter.user.id not in OWNER_IDS:
             return await inter.response.send_message("❌ Chỉ owner mới dùng được!", ephemeral=True)
         if not inter.guild:
             return await inter.response.send_message("❌ Chỉ dùng trong server!", ephemeral=True)
@@ -1966,7 +1981,7 @@ class HoSoCog(commands.Cog, name="Hồ Sơ"):
     async def broadcast(self, inter: discord.Interaction,
                         tieu_de: str, noi_dung: str,
                         mau: str = "blue"):
-        if inter.user.id != OWNER_ID:
+        if inter.user.id not in OWNER_IDS:
             return await inter.response.send_message("❌ Chỉ owner mới dùng được!", ephemeral=True)
         await inter.response.defer(ephemeral=True)
 
