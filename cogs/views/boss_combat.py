@@ -62,11 +62,13 @@ FALLBACK_SK  = {
 # ══════════════════════════════════════════════════════════════
 #  LẤY STAT BOSS TỪ BÍ CẢNH
 # ══════════════════════════════════════════════════════════════
-def _get_boss_stat(canh_gioi: int) -> dict:
+def _get_boss_stat(canh_gioi: int, so_lan_ts: int = 0) -> dict:
     """
     Lấy stat boss bí cảnh cùng cảnh giới (hoặc gần nhất) × BOSS_STAT_MULT.
     HP giữ nguyên từ BOSS_HP_BY_CG.
+    Scale theo số lần trùng sinh của player.
     """
+    from utils.config import monster_scale
     # BI_CANH[cg].boss nếu có, fallback về boss cuối cùng
     bc = None
     for b in reversed(BI_CANH):
@@ -78,14 +80,15 @@ def _get_boss_stat(canh_gioi: int) -> dict:
 
     boss_bc = bc["boss"]
     m = BOSS_STAT_MULT
+    ts_m = monster_scale(so_lan_ts)
 
     return {
-        "at":        int(boss_bc["at"]        * m),
-        "df":        int(boss_bc.get("df", 0) * m),
-        "hoi_tam":   int(boss_bc.get("hoi_tam", 0)   * m),
+        "at":        int(boss_bc["at"]        * m * ts_m),
+        "df":        int(boss_bc.get("df", 0) * m * ts_m),
+        "hoi_tam":   int(boss_bc.get("hoi_tam", 0)   * m * ts_m),
         "bao_kich":  boss_bc.get("bao_kich", 1.5),      # multiplier, không nhân
-        "ho_tam":    int(boss_bc.get("ho_tam", 0)   * m),
-        "khang_bao": min(0.90, boss_bc.get("khang_bao", 0) * m),
+        "ho_tam":    int(boss_bc.get("ho_tam", 0)   * m * ts_m),
+        "khang_bao": min(0.90, boss_bc.get("khang_bao", 0) * m * ts_m),
     }
 
 
@@ -449,7 +452,7 @@ async def do_boss_auto_combat(inter: discord.Interaction, boss_id: int) -> None:
     }
 
     # ── 6. Tính combat (blocking, chạy trong thread pool) ───────
-    boss_stat = _get_boss_stat(cg_boss)
+    boss_stat = _get_boss_stat(cg_boss, ts.get("so_lan_trung_sinh", 0))
     loop = asyncio.get_event_loop()
     logs = await loop.run_in_executor(
         None, _compute_boss_combat, ts, boss_stat, hp_boss_max, hp_boss_hien)

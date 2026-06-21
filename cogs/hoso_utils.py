@@ -254,6 +254,55 @@ def _calc_stats(ts: dict[str, Any]) -> dict[str, Any]:  # noqa: PLR0912
         df = int(df * vd_mult)
         hp_e = int(hp_e * vd_mult)
 
+    # ── Buff lớp 2 từ linh căn (drop_rate, exp_pct) ──────────
+    lc2 = _calc_linh_can_lop2(ts)
+    if lc2.get("drop_rate"):
+        drop_m = round(drop_m * (1 + lc2["drop_rate"] / 100), 2)
+    if lc2.get("exp_pct"):
+        exp_m = round(exp_m * (1 + lc2["exp_pct"] / 100), 2)
+
+    # ── Ý Cảnh effects ────────────────────────────────────────
+    from cogs.views.y_canh import _get_y_canh, _tinh_effect
+    ycanh_eff = _tinh_effect(_get_y_canh(ts))
+    if ycanh_eff.get("at_pct"):
+        at = int(at * (1 + ycanh_eff["at_pct"] / 100))
+    if ycanh_eff.get("def_pct"):
+        df = int(df * (1 + ycanh_eff["def_pct"] / 100))
+    if ycanh_eff.get("hp_pct"):
+        hp_e = int(hp_e * (1 + ycanh_eff["hp_pct"] / 100))
+    if ycanh_eff.get("exp_pct"):
+        exp_m = round(exp_m * (1 + ycanh_eff["exp_pct"] / 100), 2)
+    if ycanh_eff.get("drop_rate"):
+        drop_m = round(drop_m * (1 + ycanh_eff["drop_rate"] / 100), 2)
+    if ycanh_eff.get("lt_nhan"):
+        lt_m = round(lt_m * (1 + ycanh_eff["lt_nhan"] / 100), 2)
+
+    # ── Trận Đạo effects ──────────────────────────────────────
+    from utils.config import TRAN_DAO_BY_ID
+    tran_id = ts.get("tran_dao_active", "")
+    tran_cfg = TRAN_DAO_BY_ID.get(tran_id)
+    if tran_cfg:
+        for k, v in tran_cfg["buff"].items():
+            if k == "at_pct":
+                at = int(at * (1 + v / 100))
+            elif k == "def_pct":
+                df = int(df * (1 + v / 100))
+            elif k == "hp_pct":
+                hp_e = int(hp_e * (1 + v / 100))
+            elif k == "bao_kich":
+                pass  # applied in _calc_full_stats
+            elif k == "linh_luc_pct":
+                pass  # applied in _calc_full_stats
+            elif k == "cd_giam":
+                pass  # applied in _calc_full_stats
+        for k, v in tran_cfg["debuff"].items():
+            if k == "at_pct":
+                at = int(at * (1 + v / 100))
+            elif k == "def_pct":
+                df = int(df * (1 + v / 100))
+            elif k == "hp_pct":
+                hp_e = int(hp_e * (1 + v / 100))
+
     # Tách riêng drop_rate và lt_m từ thể chất để hiển thị trong thuộc tính
     tc_drop_rate = tc_data.get("buff", {}).get("drop_rate", 0.0) if tc_data else 0.0
     tc_lt_m      = tc_data.get("buff", {}).get("lt_m", 1.0)      if tc_data else 1.0
@@ -303,15 +352,12 @@ def _calc_full_stats(ts: dict[str, Any]) -> dict[str, Any]:
     khang_bao += st_b.get("khang_bao", 0.0)
     hoi_tam   += st_b.get("hoi_tam",   0)
     ho_tam    += st_b.get("ho_tam",    0)
-    # ── Buff lớp 2 từ linh căn (tích lũy qua các lần đột phá đại cảnh) ──
+    # ── Buff lớp 2 từ linh căn (hoi_tam, ho_tam, bao_kich, khang_bao) ──
     lc2 = _calc_linh_can_lop2(ts)
     hoi_tam   += lc2.get("hoi_tam",   0)
     ho_tam    += lc2.get("ho_tam",    0)
     bao_kich  += lc2.get("bao_kich",  0.0)
     khang_bao += lc2.get("khang_bao", 0.0)
-    # drop_rate và exp_pct lớp 2 áp vào drop_m / exp_m
-    lc2_drop  = lc2.get("drop_rate", 0.0)
-    lc2_exp   = lc2.get("exp_pct",   0.0)
 
     vd_pct = float(ts.get("van_dinh_all_stat_pct", 0.0) or 0.0)
     if vd_pct > 0:
@@ -322,16 +368,46 @@ def _calc_full_stats(ts: dict[str, Any]) -> dict[str, Any]:
         bao_kich = bao_kich * vd_mult
         khang_bao = khang_bao * vd_mult
 
+    # ── Ý Cảnh effects (full stats) ──────────────────────────
+    from cogs.views.y_canh import _get_y_canh, _tinh_effect
+    ycanh_eff = _tinh_effect(_get_y_canh(ts))
+    if ycanh_eff.get("linh_luc_pct"):
+        linh_luc = int(linh_luc * (1 + ycanh_eff["linh_luc_pct"] / 100))
+    if ycanh_eff.get("hoi_tam"):
+        hoi_tam += int(st["at"] * ycanh_eff["hoi_tam"] / 100)
+    if ycanh_eff.get("ho_tam"):
+        ho_tam += int(st["df"] * ycanh_eff["ho_tam"] / 100)
+    if ycanh_eff.get("bao_kich"):
+        bao_kich += ycanh_eff["bao_kich"]
+    if ycanh_eff.get("khang_bao"):
+        khang_bao += ycanh_eff["khang_bao"]
+    if ycanh_eff.get("crit_dmg"):
+        pass  # used in combat formula, not stored in stat
+
+    # ── Trận Đạo effects (full stats) ────────────────────────
+    from utils.config import TRAN_DAO_BY_ID
+    tran_id = ts.get("tran_dao_active", "")
+    tran_cfg = TRAN_DAO_BY_ID.get(tran_id)
+    if tran_cfg:
+        for k, v in tran_cfg["buff"].items():
+            if k == "linh_luc_pct":
+                linh_luc = int(linh_luc * (1 + v / 100))
+            elif k == "bao_kich":
+                bao_kich += v
+            elif k == "cd_giam":
+                pass  # used in combat, not stored
+        for k, v in tran_cfg["debuff"].items():
+            if k == "bao_kich":
+                bao_kich += v  # negative value
+
     # Giới hạn — cap SAU khi cộng tất cả
     bao_kich  = min(bao_kich, 75)
     khang_bao = min(khang_bao, 60)
-    # Áp drop_m / exp_m từ lớp 2 (cộng thêm vào st đã có)
-    drop_m_final = round(st["drop_m"] * (1 + lc2_drop / 100), 2) if lc2_drop else st["drop_m"]
-    exp_m_final  = round(st["exp_m"]  * (1 + lc2_exp  / 100), 2) if lc2_exp  else st["exp_m"]
+    # drop_m / exp_m đã bao gồm lop2 từ _calc_stats — dùng trực tiếp
     return {**st,
             "linh_luc": linh_luc, "hoi_tam": hoi_tam, "ho_tam": ho_tam,
             "bao_kich": bao_kich / 100, "khang_bao": khang_bao / 100,
-            "drop_m": drop_m_final, "exp_m": exp_m_final,
+            "drop_m": st["drop_m"], "exp_m": st["exp_m"],
             "lc2": lc2}
 
 
@@ -359,6 +435,20 @@ def _gen_rooms(bc: dict) -> list[dict]:
         sk = random.choice(SU_KIEN_BI_CANH) if random.random() < 0.4 else None
         rooms.append({"loai": "quai", "data": q, "su_kien": sk})
     rooms.append({"loai": "boss", "data": bc["boss"], "su_kien": None})
+    return rooms
+
+def _scale_rooms_by_rebirth(rooms: list[dict], so_lan_ts: int) -> list[dict]:
+    """Scale HP/ATK/DEF của quái theo số lần trùng sinh."""
+    if so_lan_ts <= 0:
+        return rooms
+    from utils.config import monster_scale
+    m = monster_scale(so_lan_ts)
+    for room in rooms:
+        d = room["data"]
+        d["hp"] = int(d["hp"] * m)
+        d["at"] = int(d["at"] * m)
+        if "df" in d:
+            d["df"] = int(d["df"] * m)
     return rooms
 
 def _apply_event(s: BiCanhSession, sk: dict) -> str:

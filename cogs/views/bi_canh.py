@@ -38,6 +38,7 @@ from utils.bot_emojis import (
 from cogs.hoso_utils import (
     _cleanup_stale_sessions, _bc_sessions, BiCanhSession,
     _calc_stats, _calc_full_stats, SESSION_TIMEOUT_SECS,
+    _scale_rooms_by_rebirth,
 )
 
 def _embed_bi_canh_chon(ts: dict[str, Any], user) -> discord.Embed:
@@ -412,6 +413,7 @@ class BiCanhChonView(discord.ui.View):
                     return await safe_followup(inter, "❌ Bí cảnh không hợp lệ!", ephemeral=True)
                 bc    = BI_CANH[bc_id]
                 rooms = _gen_rooms(bc)
+                rooms = _scale_rooms_by_rebirth(rooms, ts_fresh.get("so_lan_trung_sinh", 0))
                 # Sync toàn bộ chỉ số thuộc tính thực (pháp bảo, sủng thú, tông môn, linh căn)
                 full  = _calc_full_stats(ts_fresh)
                 ts_for_session = {
@@ -1449,6 +1451,20 @@ class BiCanhPhongView(discord.ui.View):
         # Sủng thú: 0.1% × drop_m
         _drop_sung_thu_bc(s, la_boss, drop_m=drop_m)
 
+        # Drop Ý Cảnh items: Đá Ngộ Đạo (5% boss, 1% quái), Đá Reset Skill Tree (2% boss)
+        from utils.config import DA_NGO_DAO_ID, DA_RESET_SKILL_TREE_ID
+        _bc_id = s.bc_id
+        if la_boss:
+            if _bc_id >= 5 and random.random() < 0.05 * drop_m:
+                s.nl_tich[DA_NGO_DAO_ID] = s.nl_tich.get(DA_NGO_DAO_ID, 0) + 1
+                s.logs.append(f"💎 Nhận **1 Đá Ngộ Đạo**!")
+            if _bc_id >= 7 and random.random() < 0.02 * drop_m:
+                s.nl_tich[DA_RESET_SKILL_TREE_ID] = s.nl_tich.get(DA_RESET_SKILL_TREE_ID, 0) + 1
+                s.logs.append(f"🔄 Nhận **1 Đá Reset Skill Tree**!")
+        elif _bc_id >= 5 and random.random() < 0.01 * drop_m:
+            s.nl_tich[DA_NGO_DAO_ID] = s.nl_tich.get(DA_NGO_DAO_ID, 0) + 1
+            s.logs.append(f"💎 Nhận **1 Đá Ngộ Đạo**!")
+
         # ── Sự kiện ngẫu nhiên (40%) — áp dụng SAU khi tính thưởng ──
         _sk = phong.get("su_kien")
         if _sk and _sk.get("loai") in ("reward", "trap"):
@@ -1666,6 +1682,7 @@ class BiCanhPhongView(discord.ui.View):
         bc_id = self.bc.get("id", 0)
         bc    = BI_CANH[bc_id]
         rooms = _gen_rooms(bc)
+        rooms = _scale_rooms_by_rebirth(rooms, ts_fresh.get("so_lan_trung_sinh", 0))
         from cogs.hoso_utils import _calc_full_stats
         full  = _calc_full_stats(ts_fresh)
         ts_for_session = {

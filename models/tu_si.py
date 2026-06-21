@@ -69,3 +69,6 @@ class TuSiDict(TypedDict, total=False):
     so_lan_trung_sinh: int
     ti_le_van_dinh: float
     van_dinh_all_stat_pct: float
+    da_van_dinh: bool
+    y_canh: dict
+    tran_dao_active: str

@@ -299,7 +299,7 @@ async def remove_lc(inter: discord.Interaction, nguoi_dung: discord.Member, linh
         if not so_huu:
             return await safe_followup(inter, "❌ Người chơi không có linh căn nào!", ephemeral=True)
         old_names = ", ".join(LINH_CAN_BY_ID[i]["ten"] for i in so_huu if i in LINH_CAN_BY_ID)
-        await update_tu_si(nguoi_dung.id, linh_can_so_huu=[], linh_can_diem={})
+        await update_tu_si(nguoi_dung.id, linh_can_so_huu=[], linh_can_diem={}, linh_can_lop2={})
         return await safe_followup(inter, 
             f"✅ Đã xóa tất cả linh căn của **{nguoi_dung.display_name}**:\n{old_names}", ephemeral=True)
     # Xóa 1 linh căn cụ thể
@@ -307,7 +307,7 @@ async def remove_lc(inter: discord.Interaction, nguoi_dung: discord.Member, linh
         return await safe_followup(inter, f"❌ Người chơi không sở hữu linh căn này!", ephemeral=True)
     so_huu = [i for i in so_huu if i != linh_can]
     diem.pop(linh_can, None)
-    await update_tu_si(nguoi_dung.id, linh_can_so_huu=so_huu, linh_can_diem=diem)
+    await update_tu_si(nguoi_dung.id, linh_can_so_huu=so_huu, linh_can_diem=diem, linh_can_lop2={})
     lc = LINH_CAN_BY_ID[linh_can]
     await safe_followup(inter, 
         f"✅ Đã xóa {lc['emoji']} **{lc['ten']}** khỏi **{nguoi_dung.display_name}**.", ephemeral=True)

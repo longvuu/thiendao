@@ -182,10 +182,15 @@ class HoSoView(discord.ui.View):
             _tv_now  = self.ts.get("exp", 0)
             if _cg_now == 9 and _cap_now == 3 and _tv_now >= VAN_DINH_TUVI_YEU_CAU:
                 self._add(3, "✨ Vấn Đỉnh", discord.ButtonStyle.danger, self._cb_van_dinh)
-            # ── Row 3: Xã hội ─────────────────────────────────────────
+            # ── Row 3: Xã hội + Ý Cảnh (sau trùng sinh) ──────────────
+            _so_lan_ts = self.ts.get("so_lan_trung_sinh", 0)
             self._add(3, "🐾 Sủng Thú",  discord.ButtonStyle.primary,   self._cb_sung_thu)
             self._add(3, "❤️ Quan hệ", discord.ButtonStyle.danger, self._cb_quan_he_owner)
             self._add(3, "🏆 Bảng XH",  discord.ButtonStyle.secondary, self._cb_bxh)
+            if _so_lan_ts >= 1:
+                self._add(4, "🧠 Ý Cảnh", discord.ButtonStyle.primary, self._cb_y_canh)
+                self._add(4, "⚔️ Trận Đạo", discord.ButtonStyle.secondary, self._cb_tran_dao)
+                self._add(4, "🛒 Cửa Hàng Ý Cảnh", discord.ButtonStyle.success, self._cb_cua_hang_y_canh)
         else:
             # ── Xem hồ sơ người khác: chỉ hiện Tặng Quà + Quan Hệ ───
             self._add(0, "🎁 Tặng Quà",   discord.ButtonStyle.success,   self._cb_tang_qua)
@@ -263,6 +268,51 @@ class HoSoView(discord.ui.View):
             await safe_followup(inter, embed=embed, view=view, ephemeral=True)
         except Exception as e:
             log.error(f"_cb_bxh user={inter.user.id}: {e}", exc_info=True)
+            await safe_followup(inter, f"❌ Lỗi: {e}", ephemeral=True)
+
+    async def _cb_y_canh(self, inter: discord.Interaction):
+        if not await self._guard(inter): return
+        await inter.response.defer(ephemeral=True)
+        try:
+            from cogs.views.y_canh import YCanhView, _embed_y_canh
+            ts = await get_tu_si(inter.user.id)
+            if not ts:
+                return await safe_followup(inter, "❌ Không tìm thấy hồ sơ!", ephemeral=True)
+            embed = _embed_y_canh(ts)
+            view = YCanhView(self, ts, actor_id=inter.user.id)
+            await safe_followup(inter, embed=embed, view=view, ephemeral=True)
+        except Exception as e:
+            log.error(f"_cb_y_canh user={inter.user.id}: {e}", exc_info=True)
+            await safe_followup(inter, f"❌ Lỗi: {e}", ephemeral=True)
+
+    async def _cb_tran_dao(self, inter: discord.Interaction):
+        if not await self._guard(inter): return
+        await inter.response.defer(ephemeral=True)
+        try:
+            from cogs.views.tran_dao import TranDaoView, _embed_tran_dao
+            ts = await get_tu_si(inter.user.id)
+            if not ts:
+                return await safe_followup(inter, "❌ Không tìm thấy hồ sơ!", ephemeral=True)
+            embed = _embed_tran_dao(ts)
+            view = TranDaoView(self, ts, actor_id=inter.user.id)
+            await safe_followup(inter, embed=embed, view=view, ephemeral=True)
+        except Exception as e:
+            log.error(f"_cb_tran_dao user={inter.user.id}: {e}", exc_info=True)
+            await safe_followup(inter, f"❌ Lỗi: {e}", ephemeral=True)
+
+    async def _cb_cua_hang_y_canh(self, inter: discord.Interaction):
+        if not await self._guard(inter): return
+        await inter.response.defer(ephemeral=True)
+        try:
+            from cogs.views.cua_hang_y_canh import CuaHangYCanhView, _embed_shop
+            ts = await get_tu_si(inter.user.id)
+            if not ts:
+                return await safe_followup(inter, "❌ Không tìm thấy hồ sơ!", ephemeral=True)
+            embed = _embed_shop(ts)
+            view = CuaHangYCanhView(self, ts, actor_id=inter.user.id)
+            await safe_followup(inter, embed=embed, view=view, ephemeral=True)
+        except Exception as e:
+            log.error(f"_cb_cua_hang_y_canh user={inter.user.id}: {e}", exc_info=True)
             await safe_followup(inter, f"❌ Lỗi: {e}", ephemeral=True)
 
     async def _cb_pvp(self, inter: discord.Interaction):

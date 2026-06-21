@@ -379,13 +379,14 @@ async def get_promo_code_owner(code: str) -> int | None:
 #  TRÙNG SINH / VẤN ĐỈNH TIÊN TÔN
 # ══════════════════════════════════════════════════════
 
-async def thuc_hien_trung_sinh(user_id: int, bonus_all_stat_pct: float = 0.0) -> dict:
+async def thuc_hien_trung_sinh(user_id: int, bonus_all_stat_pct: float = 0.0, da_van_dinh: bool = False) -> dict:
     """
     Thực hiện trùng sinh nhân vật.
 
     Giữ lại : dao_hieu, the_chat, sung_thu, sung_thu_active,
                linh_can_so_huu (điểm về 0), dotpha_tc_nl,
-               so_lan_trung_sinh, ti_le_van_dinh, van_dinh_all_stat_pct
+               so_lan_trung_sinh, ti_le_van_dinh, van_dinh_all_stat_pct,
+               da_van_dinh
     Xóa sạch của acc này: linh_thach, phap_bao, dan_duoc, nguyen_lieu, linh_qua,
             manh_linh_can, linh_can_diem, cong_phap, phien_cho,
       giao_dich_log 36h.
@@ -561,9 +562,11 @@ async def thuc_hien_trung_sinh(user_id: int, bonus_all_stat_pct: float = 0.0) ->
                     linh_qua='{}', linh_can_lop2='{}',
                     banner_id=0,
                     so_lan_trung_sinh=$2, ti_le_van_dinh=$3,
-                    van_dinh_all_stat_pct=$4
+                    van_dinh_all_stat_pct=$4,
+                    da_van_dinh=$6,
+                    y_canh='{}', tran_dao_active=''
                 WHERE user_id=$5
-            """, json.dumps(lc_diem_reset), so_lan_moi, ti_le_moi, vd_bonus_moi, user_id)
+            """, json.dumps(lc_diem_reset), so_lan_moi, ti_le_moi, vd_bonus_moi, user_id, da_van_dinh)
 
             ts_new = await conn.fetchrow("SELECT * FROM tu_si WHERE user_id=$1", user_id)
             return dict(ts_new) if ts_new else {}
