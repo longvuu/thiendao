@@ -661,11 +661,21 @@ class GiveCog(commands.Cog, name="Admin Give"):
 
         @give_group.error
         async def _give_error(inter: discord.Interaction, error: app_commands.AppCommandError):
-            if not isinstance(error, app_commands.CheckFailure):
+            if isinstance(error, app_commands.CheckFailure):
+                return
+            if isinstance(error, app_commands.TransformerError):
                 try:
-                    await safe_followup(inter, embed=e_loi("Loi", str(error)), ephemeral=True)
+                    await safe_followup(inter, 
+                        "❌ Không tìm thấy người chơi này trong server!\n"
+                        "Hãy **tag họ từ dropdown** thay vì gõ tên.",
+                        ephemeral=True)
                 except Exception:
                     log.exception("Lỗi give")
+                return
+            try:
+                await safe_followup(inter, embed=e_loi("Loi", str(error)), ephemeral=True)
+            except Exception:
+                log.exception("Lỗi give")
 
     async def cog_unload(self):
         self.bot.tree.remove_command("give")
