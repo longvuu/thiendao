@@ -1456,13 +1456,13 @@ class BiCanhPhongView(discord.ui.View):
         _bc_id = s.bc_id
         if _da_trung_sinh:
             if la_boss:
-                if _bc_id >= 5 and random.random() < 0.02 * drop_m:
+                if _bc_id >= 6 and random.random() < 0.02 * drop_m:
                     s.nl_tich[DA_NGO_DAO_ID] = s.nl_tich.get(DA_NGO_DAO_ID, 0) + 1
                     s.logs.append(f"💎 Nhận **1 Đá Ngộ Đạo**!")
                 if _bc_id >= 7 and random.random() < 0.02 * drop_m:
                     s.nl_tich[DA_RESET_SKILL_TREE_ID] = s.nl_tich.get(DA_RESET_SKILL_TREE_ID, 0) + 1
                     s.logs.append(f"🔄 Nhận **1 Đá Reset Skill Tree**!")
-            elif _bc_id >= 5 and random.random() < 0.005 * drop_m:
+            elif _bc_id >= 6 and random.random() < 0.005 * drop_m:
                 s.nl_tich[DA_NGO_DAO_ID] = s.nl_tich.get(DA_NGO_DAO_ID, 0) + 1
                 s.logs.append(f"💎 Nhận **1 Đá Ngộ Đạo**!")
 
