@@ -103,6 +103,37 @@ from utils.embeds import safe_followup, safe_defer
 # ══════════════════════════════════════════════════════════════
 
 
+class BiCanhLoaiView(discord.ui.View):
+    def __init__(self, parent_view, ts, actor_id, guild_id, mount_lv):
+        super().__init__(timeout=120)
+        self._parent = parent_view
+        self._ts = ts
+        self._actor_id = actor_id
+        self._guild_id = guild_id
+        self._mount_lv = mount_lv
+
+    @discord.ui.button(label="⚔️ Bí Cảnh Thường", style=discord.ButtonStyle.primary, row=0)
+    async def btn_thuong(self, inter):
+        if inter.user.id != self._actor_id:
+            return await inter.response.send_message("❌", ephemeral=True)
+        await inter.response.defer(ephemeral=True)
+        embed2 = _embed_bi_canh_chon(self._ts, inter.user)
+        await _send_bi_canh_embed(inter, embed2,
+            BiCanhChonView(self._parent, self._ts, actor_id=self._actor_id, guild_id=self._guild_id),
+            respond=False)
+
+    @discord.ui.button(label="🐉 Bí Cảnh Tọa Kỵ", style=discord.ButtonStyle.success, row=0)
+    async def btn_toa_ky(self, inter):
+        if inter.user.id != self._actor_id:
+            return await inter.response.send_message("❌", ephemeral=True)
+        if self._mount_lv < 1:
+            return await inter.response.send_message("❌ Cần có tọa kỵ level ≥ 1!", ephemeral=True)
+        await inter.response.defer(ephemeral=True)
+        from cogs.views.toa_ky_bi_canh import ToaKyBiCanhView, _embed_toa_ky_bi_canh_chon
+        embed3 = _embed_toa_ky_bi_canh_chon(self._ts, inter.user)
+        view3 = ToaKyBiCanhView(self._parent, self._ts, actor_id=self._actor_id, guild_id=self._guild_id)
+        await _send_bi_canh_embed(inter, embed3, view3, respond=False)
+
 class HoSoView(discord.ui.View):
     """
     Row 0 : tab buttons  [📋 Hồ Sơ] [⚔️ Hành Động] [🎒 Kho Đồ] [🌍 Thế Giới]
@@ -1078,7 +1109,6 @@ class HoSoView(discord.ui.View):
             # Kiểm tra có mount không để quyết định hiển thị nút BC Tọa Kỵ
             from cogs.hoso_utils import _get_mount_level
             mount_lv = _get_mount_level(ts)
-            _parent_view = self  # capture HoSoView reference for inner class
 
             # Tạo embed chọn 2 loại BC
             embed = discord.Embed(title="🗺️ CHỌN BÍ CẢNH", color=0x4FC3F7,
@@ -1102,36 +1132,7 @@ class HoSoView(discord.ui.View):
                     value="Cần có tọa kỵ level ≥ 1\n*Dùng `/toaky` hoặc nút 🐉 Tọa Kỵ để xem*",
                     inline=False)
 
-            # Tạo view với 2 nút chọn
-            class BiCanhLoaiView(discord.ui.View):
-                def __init__(self):
-                    super().__init__(timeout=120)
-
-                @discord.ui.button(label="⚔️ Bí Cảnh Thường", style=discord.ButtonStyle.primary, row=0)
-                async def btn_thuong(self_btn, btn_inter: discord.Interaction):
-                    if btn_inter.user.id != actor_id:
-                        return await btn_inter.response.send_message("❌", ephemeral=True)
-                    await btn_inter.response.defer(ephemeral=True)
-                    embed2 = _embed_bi_canh_chon(ts, btn_inter.user)
-                    await _send_bi_canh_embed(btn_inter, embed2,
-                        BiCanhChonView(_parent_view, ts, actor_id=actor_id, guild_id=guild_id),
-                        respond=False)
-
-                @discord.ui.button(label="🐉 Bí Cảnh Tọa Kỵ", style=discord.ButtonStyle.success, row=0,
-                                   disabled=(mount_lv < 1))
-                async def btn_toa_ky(self_btn, btn_inter: discord.Interaction):
-                    if btn_inter.user.id != actor_id:
-                        return await btn_inter.response.send_message("❌", ephemeral=True)
-                    if mount_lv < 1:
-                        return await btn_inter.response.send_message(
-                            "❌ Cần có tọa kỵ level ≥ 1!", ephemeral=True)
-                    await btn_inter.response.defer(ephemeral=True)
-                    from cogs.views.toa_ky_bi_canh import ToaKyBiCanhView, _embed_toa_ky_bi_canh_chon
-                    embed3 = _embed_toa_ky_bi_canh_chon(ts, btn_inter.user)
-                    view3 = ToaKyBiCanhView(_parent_view, ts, actor_id=actor_id, guild_id=guild_id)
-                    await _send_bi_canh_embed(btn_inter, embed3, view3, respond=False)
-
-            view = BiCanhLoaiView()
+            view = BiCanhLoaiView(self, ts, actor_id=actor_id, guild_id=guild_id, mount_lv=mount_lv)
             # respond=False vì đã defer ở trên — dùng followup.send
             await _send_bi_canh_embed(inter, embed, view, respond=False)
         except Exception as e:
