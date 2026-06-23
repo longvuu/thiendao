@@ -392,6 +392,10 @@ async def migrate_db():
         ("da_van_dinh",        "BOOLEAN DEFAULT FALSE"),
         ("y_canh",             "TEXT DEFAULT '{}'"),
         ("tran_dao_active",    "TEXT DEFAULT ''"),
+        ("toa_ky",             "TEXT DEFAULT '{}'"),
+        ("toa_ky_active",      "INTEGER DEFAULT -1"),
+        ("toa_ky_herb",        "TEXT DEFAULT '{}'"),
+        ("toa_ky_pity",        "INTEGER DEFAULT 0"),
     ]
 
     async with pool.acquire() as conn:
@@ -669,7 +673,8 @@ def _parse(row: dict) -> dict:
     if "phap_bao_active" in row and row["phap_bao_active"] is not None:
         row["phap_bao_active"] = int(row["phap_bao_active"])
     for key in ["dan_duoc", "cong_phap_trang_bi", "cong_phap_tang", "sung_thu",
-                "linh_can_diem", "manh_linh_can", "linh_qua", "dotpha_tc_nl", "linh_can_lop2"]:
+                "linh_can_diem", "manh_linh_can", "linh_qua", "dotpha_tc_nl", "linh_can_lop2",
+                "toa_ky_herb", "toa_ky"]:
         if key not in row:
             continue
         val = row[key]
@@ -686,7 +691,7 @@ def _serialize(kwargs: dict) -> dict:
             kwargs[key] = json.dumps(kwargs[key], ensure_ascii=False)
     for key in ["dan_duoc", "nguyen_lieu", "cong_phap_trang_bi", "cong_phap_tang", "sung_thu",
                 "cong_phap_hoc", "linh_can_diem", "manh_linh_can", "linh_qua", "dotpha_tc_nl",
-                "linh_can_lop2"]:
+                "linh_can_lop2", "toa_ky_herb", "toa_ky"]:
         if key in kwargs and not isinstance(kwargs[key], str):
             kwargs[key] = json.dumps(kwargs[key], ensure_ascii=False)
     return kwargs

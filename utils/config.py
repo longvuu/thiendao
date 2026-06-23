@@ -17,6 +17,14 @@ from utils.bot_emojis import (
 from data.game_data import *
 from data.bi_canh_data import BI_CANH, BI_CANH_BY_ID
 from data.boss_data import BOSS_THE_GIOI, BOSS_SPAWN_HOURS_VN
+from data.toa_ky_data import (
+    TOA_KY, TOA_KY_BY_ID, TOA_KY_BY_HE,
+    TOA_KY_LEVEL_MULT, TOA_KY_LEVELUP_CG_YEU_CAU,
+    TOA_KY_NGUYEN_LIEU, TOA_KY_NL_BY_ID, TOA_KY_LEVELUP_COST,
+    TOA_KY_BANNER_NORMAL, TOA_KY_BANNER_FEATURED,
+    TOA_KY_RARITY_POOL, TOA_KY_DUPE_TINH_HOA,
+    TOA_KY_BI_CANH, TOA_KY_BI_CANH_BY_ID,
+)
 
 load_dotenv()  # Tự động đọc file .env
 

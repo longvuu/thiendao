@@ -72,3 +72,6 @@ class TuSiDict(TypedDict, total=False):
     da_van_dinh: bool
     y_canh: dict
     tran_dao_active: str
+    toa_ky: dict
+    toa_ky_active: int
+    toa_ky_herb: dict

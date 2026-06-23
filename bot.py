@@ -73,6 +73,7 @@ COGS = [
     "cogs.world_chat",  # /worldchat — kênh thế giới liên server
     "cogs.vote",        # /vote — biểu quyết toàn server (owner only)
     "cogs.shop",        # /shop, /gencode, /redeem — promo code system
+    "cogs.toa_ky",      # /toaky — mount system
 ]
 
 intents = discord.Intents.default()

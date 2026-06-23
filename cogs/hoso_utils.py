@@ -31,6 +31,7 @@ from utils.config import (
     get_cg, get_cg_ten, bar, fmt, fmt_cd,
     exp_can_thiet, hp_max_cong_thuc, cong_cong_thuc, thu_cong_thuc,
     random_linh_can_co_ban,
+    TOA_KY_BY_ID, TOA_KY_LEVEL_MULT,
 )
 from utils.embeds import e_loi, e_ok, e_warn, e_info
 from utils.emoji_manager import get_stat_emoji
@@ -73,6 +74,7 @@ def diem_danh_day_delta(last_claim_ts: int, now_ts: int | None = None) -> int:
 
 # Cache cho lazy import sung_thu (tránh circular + overhead lặp lại)
 _st_buff_fn = None
+_tk_buff_fn = None
 ITEMS_PER_PAGE = 5
 
 from cogs.views._session import BiCanhSession, _bc_sessions, SESSION_TIMEOUT_SECS, _cleanup_stale_sessions
@@ -179,6 +181,61 @@ def _calc_linh_can_lop2(ts: dict[str, Any]) -> dict[str, Any]:
     return raw
 
 
+def _get_mount_level(ts: dict[str, Any]) -> int:
+    """Lấy level của mount active. Trả về 0 nếu không có mount."""
+    active_id = ts.get("toa_ky_active", -1)
+    if active_id < 0:
+        return 0
+    kho = ts.get("toa_ky", {})
+    if isinstance(kho, str):
+        try:
+            import json as _jtk
+            kho = _jtk.loads(kho) if kho else {}
+        except Exception:
+            kho = {}
+    if not isinstance(kho, dict):
+        return 0
+    mount_data = kho.get(str(active_id))
+    if not mount_data:
+        return 0
+    return mount_data.get("level", 1)
+
+
+def _calc_toa_ky_buff(ts: dict[str, Any]) -> dict[str, Any]:
+    """Tính buff từ mount active — áp dụng vào _calc_stats()."""
+    result = {
+        "at_pct": 0.0, "def_pct": 0.0, "hp_pct": 0.0,
+        "bao_kich": 0.0, "khang_bao": 0.0,
+        "hoi_tam": 0, "ho_tam": 0,
+        "drop_rate": 0.0, "exp_pct": 0.0,
+    }
+    active_id = ts.get("toa_ky_active", -1)
+    if active_id < 0:
+        return result
+    mount = TOA_KY_BY_ID.get(active_id)
+    if not mount:
+        return result
+    kho = ts.get("toa_ky", {})
+    if isinstance(kho, str):
+        try:
+            import json as _jtk
+            kho = _jtk.loads(kho) if kho else {}
+        except Exception:
+            kho = {}
+    if not isinstance(kho, dict):
+        return result
+    mount_data = kho.get(str(active_id))
+    if not mount_data:
+        return result
+    level = mount_data.get("level", 1)
+    mult = TOA_KY_LEVEL_MULT.get(level, 1.0)
+    base = mount.get("effect", {})
+    for k, v in base.items():
+        if k in result:
+            result[k] += v * mult
+    return result
+
+
 def _calc_stats(ts: dict[str, Any]) -> dict[str, Any]:  # noqa: PLR0912
     # Pháp bảo: chỉ 1 pháp bảo active đóng góp stats
     _pb_active_id = ts.get("phap_bao_active", -1)
@@ -246,6 +303,17 @@ def _calc_stats(ts: dict[str, Any]) -> dict[str, Any]:  # noqa: PLR0912
     if st_b.get("exp_pct"):  exp_m = round(exp_m * (1 + st_b["exp_pct"] / 100), 2)
     # drop_rate sủng thú → chỉ ảnh hưởng drop_m, KHÔNG ảnh hưởng lt_m
     if st_b.get("drop_rate"): drop_m = round(drop_m * (1 + st_b["drop_rate"] / 100), 2)
+
+    # Tọa Kỵ buff (lazy import)
+    global _tk_buff_fn
+    if _tk_buff_fn is None:
+        _tk_buff_fn = _calc_toa_ky_buff
+    tk_b = _tk_buff_fn(ts)
+    if tk_b.get("at_pct"):   at   = int(at   * (1 + tk_b["at_pct"]  / 100))
+    if tk_b.get("def_pct"):  df   = int(df   * (1 + tk_b["def_pct"] / 100))
+    if tk_b.get("hp_pct"):   hp_e = int(hp_e * (1 + tk_b["hp_pct"]  / 100))
+    if tk_b.get("exp_pct"):  exp_m = round(exp_m * (1 + tk_b["exp_pct"] / 100), 2)
+    if tk_b.get("drop_rate"): drop_m = round(drop_m * (1 + tk_b["drop_rate"] / 100), 2)
 
     vd_pct = float(ts.get("van_dinh_all_stat_pct", 0.0) or 0.0)
     if vd_pct > 0:
@@ -352,6 +420,12 @@ def _calc_full_stats(ts: dict[str, Any]) -> dict[str, Any]:
     khang_bao += st_b.get("khang_bao", 0.0)
     hoi_tam   += st_b.get("hoi_tam",   0)
     ho_tam    += st_b.get("ho_tam",    0)
+    # Tọa Kỵ BK/KB/HT/HoT buff
+    tk_b = _calc_toa_ky_buff(ts)
+    bao_kich  += tk_b.get("bao_kich",  0.0)
+    khang_bao += tk_b.get("khang_bao", 0.0)
+    hoi_tam   += tk_b.get("hoi_tam",   0)
+    ho_tam    += tk_b.get("ho_tam",    0)
     # ── Buff lớp 2 từ linh căn (hoi_tam, ho_tam, bao_kich, khang_bao) ──
     lc2 = _calc_linh_can_lop2(ts)
     hoi_tam   += lc2.get("hoi_tam",   0)
