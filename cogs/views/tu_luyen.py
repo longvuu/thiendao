@@ -121,6 +121,10 @@ class DungDotPhaView(discord.ui.View):
             for d in DAN_TU_LUYEN[cg_id]:
                 if d["ten"] == ten and d["cap_nho_sau"] == cap_nho_sau:
                     dan_info = d; break
+            if dan_info is None:  # tên đan đã đổi — fallback theo cap_nho_sau
+                matches = [d for d in DAN_TU_LUYEN[cg_id] if d["cap_nho_sau"] == cap_nho_sau]
+                if len(matches) == 1:
+                    dan_info = matches[0]
         if dan_info is None:
             return await inter.response.send_message("❌ Đan không hợp lệ!", ephemeral=True)
 
@@ -318,16 +322,22 @@ class TuLuyenView(discord.ui.View):
                     continue
                 cg_id, cap_nho_sau, ten = int(parts[0]), int(parts[1]), parts[2]
                 emoji = ""
+                ten_display = ten
                 if 0 <= cg_id < len(DAN_TU_LUYEN):
                     for d in DAN_TU_LUYEN[cg_id]:
                         if d["ten"] == ten and d["cap_nho_sau"] == cap_nho_sau:
                             emoji = d["emoji"]; break
+                    if not emoji:  # tên đã đổi — fallback theo cap_nho_sau
+                        matches = [d for d in DAN_TU_LUYEN[cg_id] if d["cap_nho_sau"] == cap_nho_sau]
+                        if len(matches) == 1:
+                            emoji = matches[0]["emoji"]
+                            ten_display = matches[0]["ten"]
                 cg_ten = CANH_GIOI[cg_id]["ten"] if 0 <= cg_id < len(CANH_GIOI) else "?"
                 ki_sau = "Trung Kì" if cap_nho_sau == 2 else "Hậu Kì"
                 opts.append(discord.SelectOption(
-                    label=f"{ten} ×{v}",
+                    label=f"{ten_display} ×{v}",
                     value=k,
-                    emoji=_parse_emoji(emoji),
+                    emoji=_parse_emoji(emoji) if emoji else None,
                     description=f"{cg_ten} → {ki_sau}"))
 
             if not opts:
