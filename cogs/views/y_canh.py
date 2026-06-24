@@ -304,7 +304,7 @@ class YCanhNhanhView(discord.ui.View):
             ),
             color=0x9B59B6,
         )
-        view = YCanhView(self.parent_view, ts, self.actor_id)
+        view = YCanhView(self.parent_view.parent, ts, self.actor_id)
         await safe_followup(inter, embed=embed, view=view, ephemeral=True)
 
 
