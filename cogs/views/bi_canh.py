@@ -1301,8 +1301,8 @@ class BiCanhPhongView(discord.ui.View):
             try:
                 job._message = await inter.original_response()
                 self._msg    = job._message
-            except Exception:
-                log.exception("Lỗi bi_canh")
+            except discord.NotFound:
+                pass  # Webhook expired — message.edit() sẽ fallback
         import asyncio as _asyncio
         _asyncio.ensure_future(_fetch_and_cache())
         cog = self._get_task_cog(inter)
@@ -1542,8 +1542,8 @@ class BiCanhPhongView(discord.ui.View):
             return await inter.response.send_message("❌", ephemeral=True)
         try:
             await inter.response.defer()
-        except Exception:
-            log.exception("Lỗi bi_canh")
+        except discord.NotFound:
+            pass  # Interaction đã expired — vẫn tiếp tục
         nv = BiCanhPhongView(self.parent, self.s, self.bc, bc_view=self.bc_view)
         nv._msg = self._msg  # kế thừa cached message
         nv._compute_combat()
@@ -1559,8 +1559,8 @@ class BiCanhPhongView(discord.ui.View):
             return await inter.response.send_message("❌", ephemeral=True)
         try:
             await inter.response.defer()
-        except Exception:
-            log.exception("Lỗi bi_canh")
+        except discord.NotFound:
+            pass
         s = self.s
         s.ket_thuc = True
         _bc_sessions.pop((self.guild_id, self.actor_id), None)
@@ -1654,8 +1654,8 @@ class BiCanhPhongView(discord.ui.View):
             return await inter.response.send_message("❌", ephemeral=True)
         try:
             await inter.response.defer()
-        except Exception:
-            log.exception("Lỗi bi_canh")
+        except discord.NotFound:
+            pass
         ts_fresh   = await get_tu_si(self.actor_id)
         tl_hien    = get_the_luc(ts_fresh)
         tran_hien2 = get_tran_the_luc(ts_fresh)
@@ -1717,8 +1717,8 @@ class BiCanhPhongView(discord.ui.View):
             return await inter.response.send_message("❌", ephemeral=True)
         try:
             await inter.response.defer()
-        except Exception:
-            log.exception("Lỗi bi_canh")
+        except discord.NotFound:
+            pass
         self.s.ket_thuc = True
         _bc_sessions.pop((self.guild_id, self.actor_id), None)
 
