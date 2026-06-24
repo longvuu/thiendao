@@ -552,6 +552,8 @@ async def do_boss_auto_combat(inter: discord.Interaction, boss_id: int) -> None:
 
     try:
         await msg.edit(embed=emb_done, view=done_view)
+    except discord.NotFound:
+        pass  # Message bị xóa trước khi bot kịp edit
     except Exception:
         log.exception("Lỗi boss_combat")
 

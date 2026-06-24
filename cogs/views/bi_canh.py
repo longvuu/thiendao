@@ -1624,9 +1624,11 @@ class BiCanhPhongView(discord.ui.View):
             nl_lines = []
             for k, v in s.nl_tich.items():
                 try:
-                    nl_lines.append(f"{NGUYEN_LIEU[int(k)]['emoji']} ×{v}")
-                except Exception:
-                    log.exception("Lỗi bi_canh")
+                    idx = int(k)
+                    if 0 <= idx < len(NGUYEN_LIEU):
+                        nl_lines.append(f"{NGUYEN_LIEU[idx]['emoji']} ×{v}")
+                except (ValueError, TypeError):
+                    pass
             if nl_lines:
                 embed.add_field(name="📦 Nguyên liệu giữ lại", value="  ".join(nl_lines), inline=False)
         if s.linh_qua_tich or s.manh_tich:
