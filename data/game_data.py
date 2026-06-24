@@ -379,6 +379,17 @@ PHAP_BAO: list[dict[str, Any]] = [
     {"id": 87, "id_base":9, "ten":"Cổ Cầm", "emoji":"<:cocam:1482901971609325568>", "canh_gioi":6, "at":  476, "df":    0, "passive":{'hp_pct': 1.8, 'at_pct': 4.2, 'df_pct': 1.2}, "mo_ta":"Cổ cầm linh âm — tấn công cao nhất"},
     {"id": 88, "id_base":9, "ten":"Cổ Cầm", "emoji":"<:cocam:1482901971609325568>", "canh_gioi":7, "at":  854, "df":    0, "passive":{'hp_pct': 2.1, 'at_pct': 4.4, 'df_pct': 1.4}, "mo_ta":"Cổ cầm linh âm — tấn công cao nhất"},
     {"id": 89, "id_base":9, "ten":"Cổ Cầm", "emoji":"<:cocam:1482901971609325568>", "canh_gioi":8, "at": 1540, "df":    0, "passive":{'hp_pct': 2.4, 'at_pct': 4.6, 'df_pct': 1.6}, "mo_ta":"Cổ cầm linh âm — tấn công cao nhất"},
+    # ─── Cảnh giới 9 — Đăng Tiên ───────────────────────────────────────────────
+    {"id": 90, "id_base":0, "ten":"Hiệu Giác",  "emoji":"<:hieugiac:1482901981314945067>",  "canh_gioi":9, "at": 1584, "df":    0, "passive":{'hp_pct': 2.7, 'at_pct': 3.8, 'df_pct': 1.8}, "mo_ta":"Công kích sắc bén — tấn công tăng"},
+    {"id": 91, "id_base":1, "ten":"Hoàng Cực",  "emoji":"<:hoangcuc:1482901980358639699>",  "canh_gioi":9, "at":    0, "df": 2376, "passive":{'hp_pct': 2.7, 'at_pct': 1.8, 'df_pct': 3.8}, "mo_ta":"Phòng ngự vững chắc — phòng thủ tăng"},
+    {"id": 92, "id_base":2, "ten":"Tinh Chùy",  "emoji":"<:tinhchuy:1482901979087769804>",  "canh_gioi":9, "at": 1980, "df":  594, "passive":{'hp_pct': 2.7, 'at_pct': 3.8, 'df_pct': 1.8}, "mo_ta":"Vũ khí công thủ — thiên về tấn công"},
+    {"id": 93, "id_base":3, "ten":"Huyền Chung","emoji":"<:huyenchung:1482901978232127499>","canh_gioi":9, "at":  594, "df": 1980, "passive":{'hp_pct': 3.7, 'at_pct': 1.8, 'df_pct': 3.8}, "mo_ta":"Linh chung hộ thể — thiên về phòng thủ"},
+    {"id": 94, "id_base":4, "ten":"Huyết Diện", "emoji":"<:huyetdien:1482901977586208920>", "canh_gioi":9, "at": 2376, "df":  396, "passive":{'hp_pct': 2.7, 'at_pct': 4.8, 'df_pct': 1.8}, "mo_ta":"Diện mạo huyết sát — bạo kích tăng"},
+    {"id": 95, "id_base":5, "ten":"Chi Kỳ",     "emoji":"<:chiky:1482901976457937117>",     "canh_gioi":9, "at": 1188, "df": 1188, "passive":{'hp_pct': 2.7, 'at_pct': 2.8, 'df_pct': 2.8}, "mo_ta":"Cờ trận cân bằng — tăng đều AT/DEF"},
+    {"id": 96, "id_base":6, "ten":"Ngưng Châu", "emoji":"<:ngungchau:1482901974998450247>", "canh_gioi":9, "at":  792, "df":  792, "passive":{'hp_pct': 4.7, 'at_pct': 1.8, 'df_pct': 1.8}, "mo_ta":"Châu ngưng linh khí — tăng sinh lực"},
+    {"id": 97, "id_base":7, "ten":"Bạch Bào",   "emoji":"<:bachbao:1482901973366865920>",   "canh_gioi":9, "at":  396, "df": 2772, "passive":{'hp_pct': 3.7, 'at_pct': 1.8, 'df_pct': 4.8}, "mo_ta":"Áo trắng hộ thể — phòng ngự cao nhất"},
+    {"id": 98, "id_base":8, "ten":"Thiết Bích", "emoji":"<:thietbich:1482901970003169360>", "canh_gioi":9, "at": 1584, "df": 1584, "passive":{'hp_pct': 3.7, 'at_pct': 2.8, 'df_pct': 2.8}, "mo_ta":"Thiết bích kim thành — cân bằng cao cấp"},
+    {"id": 99, "id_base":9, "ten":"Cổ Cầm",     "emoji":"<:cocam:1482901971609325568>",     "canh_gioi":9, "at": 2772, "df":    0, "passive":{'hp_pct': 2.7, 'at_pct': 4.8, 'df_pct': 1.8}, "mo_ta":"Cổ cầm linh âm — tấn công cao nhất"},
 ]
 PHAP_BAO_BY_ID: dict[int, dict[str, Any]] = {pb["id"]: pb for pb in PHAP_BAO}
 
@@ -672,8 +683,9 @@ SU_KIEN_BI_CANH = [
      "mo_ta": "Cẩn thận! Ngươi vô tình kích hoạt bẫy trận bí ẩn!", "hp_mat": 0.15},
     {"id": "quy_khi",   "ten": "Bị Quỷ Khí Xâm Nhập!","emoji": "👻","loai": "trap",
      "mo_ta": "Quỷ khí tràn vào kinh mạch, nguyên lực tổn thất...", "hp_mat": 0.1, "lt_mat": 0.1},
-    {"id": "linh_tho",  "ten": "Gặp Linh Thú Lang Thang!","emoji": "🐾","loai": "combat_bonus",
-     "mo_ta": "Một linh thú yếu lang thang, ngươi dễ dàng thu phục...", "yeu_thu_bonus": True},
+    {"id": "linh_tho",  "ten": "Gặp Linh Thú Lang Thang!","emoji": "🐾","loai": "reward",
+     "mo_ta": "Một linh thú yếu lang thang, ngươi dễ dàng thu phục và nhận thưởng...",
+     "lt_bonus": 0.1, "hp_bonus": 0.05, "exp_bonus": 0.2},
 ]
 
 # ══════════════════════════════════════════════════════
@@ -697,7 +709,7 @@ DAN_TU_LUYEN = [
     [{"ten": "Ngưng Thần Đan",   "emoji": E_NGUNGTHAN,   "cap_nho_sau": 2, "rate": 0.05, "gia": _DTL_GIA[6]},
      {"ten": "Thăng Nguyên Đan", "emoji": E_THANGNGUYEN, "cap_nho_sau": 3, "rate": 0.05, "gia": _DTL_GIA[6]*2}],
     [{"ten": "Hoàn Nguyên Đan",  "emoji": E_HOANNGUYEN,  "cap_nho_sau": 2, "rate": 0.05, "gia": _DTL_GIA[7]},
-     {"ten": "Thăng Nguyên Đan", "emoji": E_THANGNGUYEN, "cap_nho_sau": 3, "rate": 0.05, "gia": _DTL_GIA[7]*2}],
+     {"ten": "Khai Đạo Nguyên Đan", "emoji": E_KETTHAN, "cap_nho_sau": 3, "rate": 0.05, "gia": _DTL_GIA[7]*2}],
     [{"ten": "Hỗn Độn Chi Tức",              "emoji": E_HONDONCHITUC,       "cap_nho_sau": 2, "rate": 0.05, "gia": _DTL_GIA[8]},
      {"ten": "Hỗn Độn Linh Tức",             "emoji": E_HONDONLINHTUC,      "cap_nho_sau": 2, "rate": 0.05, "gia": _DTL_GIA[8]},
      {"ten": "Thượng Phẩm Hỗn Độn Linh Tức", "emoji": E_HONDONCHITUC_HIEM, "cap_nho_sau": 3, "rate": 0.05, "gia": _DTL_GIA[8]*2},

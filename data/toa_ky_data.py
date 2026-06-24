@@ -100,6 +100,16 @@ TOA_KY: list[dict[str, Any]] = [
         "active_effect": "Hắc Ám Xuyên — Tấn công 40% AT, xuyên 30% DEF (CD 5)",
         "rate": 3.0,
     },
+    # ── Hỗn Nguyên — Toàn năng Thần cấp ────────────────────────────────
+    {
+        "id": 9, "he": "hon", "ten": "Hỗn Nguyên Thần Long", "emoji": "🌌",
+        "cap": "Thần",
+        "mo_ta": "Linh vật nguyên thủy khai thiên tịch địa, thân hình chứa đựng sức mạnh vạn pháp",
+        "effect": {"at_pct": 8.0, "def_pct": 6.0, "hp_pct": 8.0, "bao_kich": 4.0},
+        "passive_effect": "Hỗn Nguyên — Tăng 15% toàn bộ sát thương, giảm 10% sát thương nhận vào",
+        "active_effect": "Thiên Địa Vô Cực — Tấn công 80% AT xuyên 50% DEF, hồi 10% HP (CD 8)",
+        "rate": 0.5,
+    },
 ]
 
 TOA_KY_BY_ID: dict[int, dict[str, Any]]  = {tk["id"]: tk for tk in TOA_KY}
@@ -170,7 +180,7 @@ TOA_KY_RARITY_POOL: dict[str, list[int]] = {
     "Phàm": [1, 2, 7],           # Mộc Linh Lộc, Huyền Ngư, Minh Nguyệt Lộc
     "Linh": [0, 3, 4, 5],        # Kim Lân, Hỏa Phượng, Địa Hành Quy, Phong Long
     "Tiên": [6, 8],              # Lôi Đế, Hắc Diệm Sư
-    "Thần": [],                   # Chưa có mount Thần cấp (mở rộng sau)
+    "Thần": [9],                  # Hỗn Nguyên Thần Long
 }
 
 # ══════════════════════════════════════════════════════

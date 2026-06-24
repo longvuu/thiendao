@@ -83,11 +83,11 @@ async def give_tv(inter: discord.Interaction, nguoi_dung: discord.Member,
         f"{cg['emoji']} **{get_cg_ten(canh_gioi, cap_nho)}**\nHP:{new_hp} {E_CONG_KICH}{new_at} {E_PHONG_NGU}{new_def}"))
 
 
-@give_group.command(name="phapbao", description="[Admin] Give pháp bảo (id 0-89, id_base 0-9, canh_gioi 0-8)")
+@give_group.command(name="phapbao", description="[Admin] Give pháp bảo (id 0-99, id_base 0-9, canh_gioi 0-9)")
 @app_commands.describe(
-    pb_id="ID pháp bảo (0-89) — hoặc dùng id_base + canh_gioi",
+    pb_id="ID pháp bảo (0-99) — hoặc dùng id_base + canh_gioi",
     id_base="Loại pháp bảo (0=Hiệu Giác … 9=Cổ Cầm)",
-    canh_gioi="Cảnh giới pháp bảo (0-8)")
+    canh_gioi="Cảnh giới pháp bảo (0-9)")
 @owner_only_check(OWNER_IDS)
 async def give_pb(inter: discord.Interaction, nguoi_dung: discord.Member,
                   pb_id: int = -1, id_base: int = -1, canh_gioi: int = -1):
