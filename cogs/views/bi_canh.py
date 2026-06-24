@@ -304,6 +304,7 @@ class BiCanhChonView(discord.ui.View):
         bc_id = int(inter.data["values"][0])
         if bc_id < 0 or bc_id >= len(BI_CANH):
             return await inter.response.send_message("❌ Bí cảnh không hợp lệ!", ephemeral=True)
+        bc    = BI_CANH[bc_id]
         ok    = self.ts["canh_gioi"] >= bc["cap_toi_thieu"]
 
         if not ok:
