@@ -563,8 +563,8 @@ async def thuc_hien_trung_sinh(user_id: int, bonus_all_stat_pct: float = 0.0, da
                     banner_id=0,
                     so_lan_trung_sinh=$2, ti_le_van_dinh=$3,
                     van_dinh_all_stat_pct=$4,
-                    da_van_dinh=$6,
-                    y_canh='{}', tran_dao_active=''
+                    da_van_dinh=$6
+
                 WHERE user_id=$5
             """, json.dumps(lc_diem_reset), so_lan_moi, ti_le_moi, vd_bonus_moi, user_id, da_van_dinh)
 

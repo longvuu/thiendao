@@ -207,7 +207,13 @@ class ToaKyView(discord.ui.View):
         btn_gacha = discord.ui.Button(
             label="🎰 Gacha", style=discord.ButtonStyle.success, row=1)
         btn_gacha.callback = self._on_gacha
-        # Nút bí cảnh tọa kỵ        btn_bc = discord.ui.Button(            label="🗺️ Bí Cảnh", style=discord.ButtonStyle.primary, row=1)        btn_bc.callback = self._on_bicanh        self.add_item(btn_bc)        self.add_item(btn_gacha)
+        self.add_item(btn_gacha)
+
+        # Nút bí cảnh tọa kỵ
+        btn_bc = discord.ui.Button(
+            label="🗺️ Bí Cảnh", style=discord.ButtonStyle.primary, row=1)
+        btn_bc.callback = self._on_bicanh
+        self.add_item(btn_bc)
 
         # Nút danh sách tất cả
         btn_list = discord.ui.Button(
